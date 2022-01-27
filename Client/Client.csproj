@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="CliWrap" Version="3.3.*" />
+        <PackageReference Include="MQTTnet" Version="3.1.*" />
+        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.1.*" />
+        <PackageReference Include="NLog" Version="4.7.*" />
+        <PackageReference Include="Samboy063.Tomlet" Version="3.1.*" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\Common\Common.csproj" />
+    </ItemGroup>
+</Project>
