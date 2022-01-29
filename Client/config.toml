@@ -2,3 +2,7 @@
 name="16"
 ip="192.168.22.148"
 port=34152
+
+[SleepTime]
+Hour = 17
+Minute = 20

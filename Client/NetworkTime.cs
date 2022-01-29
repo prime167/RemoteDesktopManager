@@ -1,12 +1,6 @@
 ﻿using NLog;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http.Headers;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 using Tomlet;
 
 namespace Client;
@@ -18,8 +12,6 @@ public class NetworkTime
 
     private int _urlIndex;
 
-    private Random rnd = Random.Shared;
-    private int lastRandom;
     private Logger _logger = LogManager.GetCurrentClassLogger();
 
     public NetworkTime()
@@ -27,7 +19,7 @@ public class NetworkTime
         httpClient = new HttpClient(new HttpClientHandler { UseProxy = false });
         httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
         httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
-        httpClient.Timeout = TimeSpan.FromSeconds(1);
+        httpClient.Timeout = TimeSpan.FromSeconds(2);
         var str = File.ReadAllText("urls.toml");
         _urls = TomletMain.To<UrlConfig>(str).Urls;
     }
@@ -38,9 +30,10 @@ public class NetworkTime
     /// <returns></returns>
     public DateTime GetNetworkTime()
     {
+        string url="";
         try
         {
-            var url = GetNextUrl();
+            url = GetNextUrl();
             var sw = Stopwatch.StartNew();
             var response = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
             response.EnsureSuccessStatusCode();
@@ -53,7 +46,7 @@ public class NetworkTime
         }
         catch (Exception ex)
         {
-            _logger.Debug(ex.Message);
+            _logger.Debug(url+" "+ex.Message);
             return DateTime.MinValue;
         }
         finally
@@ -64,13 +57,6 @@ public class NetworkTime
 
     private string GetNextUrl()
     {
-        //do
-        //{
-        //    _urlIndex = rnd.Next(0, _urls.Count());
-        //} while (_urlIndex == lastRandom);
-
-        //lastRandom = _urlIndex;
-
         var url = _urls[_urlIndex++ % _urls.Count()];
         return url;
     }

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Samboy063.Tomlet" Version="3.1.2" />
+    <PackageReference Include="Samboy063.Tomlet" Version="3.1.*" />
   </ItemGroup>
 
 </Project>
