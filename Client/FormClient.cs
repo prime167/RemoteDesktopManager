@@ -12,7 +12,6 @@ using Client;
 using Tomlet;
 using Timer = System.Threading.Timer;
 using NLog;
-using System.Diagnostics;
 
 namespace RemoteDesktopClient;
 
@@ -26,11 +25,10 @@ public partial class FormClient : Form
     private Logger _logger = LogManager.GetCurrentClassLogger();
     private int _totalOkCount = 0;
     private int _okCount = 0;
-    private DateTime _upTime;// 系统开机，休眠恢复时间
     private NetworkTime NetworkTime = new NetworkTime();
-    private Stopwatch _stopwatch;
     private int _lastState;
-    private DateTime _lastSleepTime;
+    private int _networkFailCausedSleepCount;
+    private const int Interval = 3000;
 
     public FormClient()
     {
@@ -39,6 +37,7 @@ public partial class FormClient : Form
 
     private void FormClient_Load(object sender, EventArgs e)
     {
+        _logger.Debug("Init...");
         _updateListBoxAction = (s) =>
         {
             listBox1.BeginUpdate();
@@ -54,20 +53,24 @@ public partial class FormClient : Form
 
         var str = File.ReadAllText("config.toml");
         _config = TomletMain.To<Config>(str);
-        _stopwatch = Stopwatch.StartNew();
-        _timer = new Timer(CallBack, null, 1000, 3000);
+        _timer = new Timer(CallBack, null, Interval, Interval);
         MqttClient();
     }
 
     private void CallBack(object? state)
     {
         var sysTime = DateTime.Now;
-        var dt = NetworkTime.GetNetworkTime();
-        if (dt.Year < 1970)
+        var nt = NetworkTime.GetNetworkTime();
+        if (nt.Year < 1970)
         {
             _failCount++;
             _okCount = 0;
-            _logger.Warn($"network fail {_failCount} 网络时间:{dt}, 本机时间:{sysTime}");
+            _logger.Trace($"网络连接失败 {_failCount} 网络时间:{nt}, 本机时间:{sysTime}");
+            if (_lastState == 11 || _lastState == 12)
+            {
+                _lastState = 0;
+                _timer.Change(Interval, Interval);
+            }
         }
         else
         {
@@ -75,20 +78,18 @@ public partial class FormClient : Form
             {
                 if (_lastState == 0)
                 {
-                    _upTime = dt;
-                    _logger.Info($"软件启动, 网络时间:{dt}, 本机时间:{sysTime}");
+                    _logger.Info($"软件启动, 网络时间:{nt}, 本机时间:{sysTime}");
                 }
                 else if (_lastState > 10 && _lastState < 20)
                 {
-                    _timer.Change(1000, 1000);
+                    _timer.Change(Interval, Interval);
                     _lastState = 0;
-                    _upTime = dt;
-                    _logger.Info($"软件恢复, 网络时间:{dt}, 本机时间:{sysTime}");
+                    _logger.Info($"软件恢复, 网络时间:{nt}, 本机时间:{sysTime}");
                 }
             }
             else if (_failCount > 0)
             {
-                _logger.Info($"网络恢复, 网络时间:{dt}, 本机时间:{sysTime}");
+                _logger.Info($"网络恢复, 网络时间:{nt}, 本机时间:{sysTime}");
             }
 
             _failCount = 0;
@@ -96,35 +97,53 @@ public partial class FormClient : Form
             _totalOkCount++;
         }
 
-        // 之前连接成功一段时间，达到一定失败次数，且之前没有因此休眠过才休眠，防止循环休眠
-        if (_lastState != 11 && _totalOkCount > 300 && _failCount >= 10)
+        if (_failCount == 0)
         {
-            _logger.Info($"network failed too often,({_failCount}), sleep");
-            _totalOkCount = 0;
-            _okCount = 0;
-            _lastState = 11;
-            _lastSleepTime = dt;
-            TimeSpan interval = TimeSpan.FromSeconds(60 * 5);
-            _timer.Change(interval, interval);
-            //Sleep(true);
+            TimeReachedSleep(sysTime, nt);
         }
+        else
+        {
+            NetworkFailSleep();
+        }
+    }
 
+    private void TimeReachedSleep(DateTime sysTime, DateTime dt)
+    {
         var hour = _config.SleepTime.Hour;
         var minute = _config.SleepTime.Minute;
-        if (dt.Hour == hour && dt.Minute >= minute && dt.Minute < minute + 1)
+        if (dt.Hour == hour && dt.Minute >= minute && dt.Minute < minute +1)
         {
             if (_lastState != 12)
             {
-                _logger.Info($"network ok and time reached, sleep. 网络时间:{dt}, 本机时间:{sysTime}");
-                _okCount = 0;
-                _totalOkCount = 0;
-                _lastState = 12;
-                _lastSleepTime = dt;
-                TimeSpan interval = TimeSpan.FromSeconds(60 * 5);
-                _timer.Change(interval, interval);
-                Sleep(true);
+                _logger.Info($"到达设定休眠时间，进入休眠. 网络时间:{dt}, 本机时间:{sysTime}");
+                _networkFailCausedSleepCount = 0;
+                Sleep(12);
             }
         }
+    }
+
+    private void NetworkFailSleep()
+    {
+        // 达到一定失败次数才休眠，防止循环休眠
+        int minute = _networkFailCausedSleepCount + 1;
+        var times = (1000 * 60 / Interval) * minute +1 ;
+        if (_failCount >= times) // 一直连不上
+        {
+            _networkFailCausedSleepCount++;
+            _logger.Info($"网络失败次数达到最大值({times -1}次)，自动休眠(第{_networkFailCausedSleepCount}次)");
+            Sleep(11);
+        }
+    }
+
+    private void Sleep(int state)
+    {
+        _totalOkCount = 0;
+        _okCount = 0;
+        _failCount = 0;
+        _lastState = state;
+        TimeSpan interval = TimeSpan.FromMinutes(5);
+        _timer.Change(interval, interval);
+        Sleep(true);
     }
 
     private void MqttClient()
@@ -255,11 +274,11 @@ public partial class FormClient : Form
         }
     }
 
-    private static void Shutdown(bool real)
+    private void Shutdown(bool real)
     {
         if (!real)
         {
-            Cli.Wrap("cmd").WithArguments($@"/C code ").ExecuteAsync();
+            _logger.Debug("模拟关机");
         }
         else
         {
@@ -267,11 +286,11 @@ public partial class FormClient : Form
         }
     }
 
-    private static void Sleep(bool real)
+    private void Sleep(bool real)
     {
         if (!real)
         {
-            Cli.Wrap("cmd").WithArguments($@"/C code ").ExecuteAsync();
+            _logger.Debug("模拟休眠");
         }
         else
         {

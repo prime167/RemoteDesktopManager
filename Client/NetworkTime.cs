@@ -46,7 +46,7 @@ public class NetworkTime
         }
         catch (Exception ex)
         {
-            _logger.Debug(url+" "+ex.Message);
+            _logger.Trace(url+" "+ex.Message);
             return DateTime.MinValue;
         }
         finally
