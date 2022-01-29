@@ -97,13 +97,15 @@ public partial class FormClient : Form
         }
 
         // 之前连接成功一段时间，达到一定失败次数，且之前没有因此休眠过才休眠，防止循环休眠
-        if (_lastState != 11 && _totalOkCount > 300 && _failCount >= 30)
+        if (_lastState != 11 && _totalOkCount > 300 && _failCount >= 10)
         {
             _logger.Info($"network failed too often,({_failCount}), sleep");
             _totalOkCount = 0;
             _okCount = 0;
             _lastState = 11;
             _lastSleepTime = dt;
+            TimeSpan interval = TimeSpan.FromSeconds(60 * 5);
+            _timer.Change(interval, interval);
             //Sleep(true);
         }
 
@@ -118,7 +120,8 @@ public partial class FormClient : Form
                 _totalOkCount = 0;
                 _lastState = 12;
                 _lastSleepTime = dt;
-                _timer.Change(1000 * 60 * 2, 1000 * 60 * 2);
+                TimeSpan interval = TimeSpan.FromSeconds(60 * 5);
+                _timer.Change(interval, interval);
                 Sleep(true);
             }
         }
