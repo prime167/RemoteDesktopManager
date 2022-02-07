@@ -32,6 +32,8 @@
             this.LblServerConnState = new System.Windows.Forms.Label();
             this.LblNetworkConnState = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.LblHibernateTime = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // 服务器
@@ -76,11 +78,33 @@
             this.label2.TabIndex = 2;
             this.label2.Text = "网络";
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(24, 171);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(74, 21);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "休眠时间";
+            // 
+            // LblHibernateTime
+            // 
+            this.LblHibernateTime.AutoSize = true;
+            this.LblHibernateTime.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LblHibernateTime.Location = new System.Drawing.Point(139, 171);
+            this.LblHibernateTime.Name = "LblHibernateTime";
+            this.LblHibernateTime.Size = new System.Drawing.Size(42, 21);
+            this.LblHibernateTime.TabIndex = 5;
+            this.LblHibernateTime.Text = "--:--";
+            // 
             // FormClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(252, 292);
+            this.Controls.Add(this.LblHibernateTime);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.LblNetworkConnState);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.LblServerConnState);
@@ -99,5 +123,7 @@
         private Label LblServerConnState;
         private Label LblNetworkConnState;
         private Label label2;
+        private Label label1;
+        private Label LblHibernateTime;
     }
 }

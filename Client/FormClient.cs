@@ -41,6 +41,10 @@ public partial class FormClient : Form
         _config = TomletMain.To<Config>(str);
         _timer = new Timer(CallBack, null, Interval, Interval);
         MqttClient();
+        if (_config.SleepTime.Hour >= 0)
+        {
+            LblHibernateTime.Text = $"{_config.SleepTime.Hour}:{_config.SleepTime.Minute}";
+        }
     }
 
     private void CallBack(object? state)
