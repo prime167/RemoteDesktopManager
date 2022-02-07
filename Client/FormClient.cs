@@ -18,7 +18,6 @@ namespace RemoteDesktopClient;
 public partial class FormClient : Form
 {
     private IMqttClient _mqttClient;
-    private Action<string> _updateListBoxAction;
     private Config _config;
     private Timer _timer;
     private int _failCount;
@@ -38,19 +37,6 @@ public partial class FormClient : Form
     private void FormClient_Load(object sender, EventArgs e)
     {
         _logger.Debug("Init...");
-        _updateListBoxAction = (s) =>
-        {
-            listBox1.BeginUpdate();
-            listBox1.Items.Add(s);
-            if (listBox1.Items.Count > 100)
-            {
-                listBox1.Items.RemoveAt(0);
-            }
-
-            listBox1.TopIndex = listBox1.Items.Count - 1;
-            listBox1.EndUpdate();
-        };
-
         var str = File.ReadAllText("config.toml");
         _config = TomletMain.To<Config>(str);
         _timer = new Timer(CallBack, null, Interval, Interval);
@@ -65,7 +51,12 @@ public partial class FormClient : Form
         {
             _failCount++;
             _okCount = 0;
-            _logger.Trace($"网络连接失败 {_failCount} 网络时间:{nt}, 本机时间:{sysTime}");
+            this.BeginInvoke(() =>
+            {
+                LblNetworkConnState.Text = "x";
+                LblNetworkConnState.ForeColor = Color.Red;
+            });
+
             if (_lastState == 11 || _lastState == 12)
             {
                 _lastState = 0;
@@ -74,6 +65,12 @@ public partial class FormClient : Form
         }
         else
         {
+            this.BeginInvoke(() =>
+            { 
+                LblNetworkConnState.Text = "√";
+                LblNetworkConnState.ForeColor = Color.Green;
+            });
+
             if (_totalOkCount == 0)
             {
                 if (_lastState == 0)
@@ -111,7 +108,7 @@ public partial class FormClient : Form
     {
         var hour = _config.SleepTime.Hour;
         var minute = _config.SleepTime.Minute;
-        if (dt.Hour == hour && dt.Minute >= minute && dt.Minute < minute +1)
+        if (dt.Hour == hour && dt.Minute >= minute && dt.Minute < minute + 1)
         {
             if (_lastState != 12)
             {
@@ -126,11 +123,11 @@ public partial class FormClient : Form
     {
         // 达到一定失败次数才休眠，防止循环休眠
         int minute = _networkFailCausedSleepCount + 1;
-        var times = (1000 * 60 / Interval) * minute +1 ;
+        var times = (1000 * 60 / Interval) * minute + 1;
         if (_failCount >= times) // 一直连不上
         {
             _networkFailCausedSleepCount++;
-            _logger.Info($"网络失败次数达到最大值({times -1}次)，自动休眠(第{_networkFailCausedSleepCount}次)");
+            _logger.Info($"网络失败次数达到最大值({times - 1}次)，自动休眠(第{_networkFailCausedSleepCount}次)");
             Sleep(11);
         }
     }
@@ -187,14 +184,20 @@ public partial class FormClient : Form
 
             _mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(e =>
             {
-                listBox1.BeginInvoke(_updateListBoxAction,
-                    $"{DateTime.Now} Client is Connected");
+                this.BeginInvoke(() =>
+                {
+                    LblServerConnState.Text = "√";
+                    LblServerConnState.ForeColor = Color.Green;
+                });
             });
 
             _mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(e =>
             {
-                listBox1.BeginInvoke(_updateListBoxAction,
-                    $"{DateTime.Now} Client is DisConnected ClientWasConnected:{e.ClientWasConnected}");
+                this.BeginInvoke(() =>
+                {
+                    LblServerConnState.Text = "x";
+                    LblServerConnState.ForeColor = Color.Red;
+                });
 
                 Thread.Sleep(1000);
                 _mqttClient.ConnectAsync(options).Wait();
@@ -255,10 +258,10 @@ public partial class FormClient : Form
     {
         var topic = e.ApplicationMessage.Topic;
         var payload = Encoding.UTF8.GetString(e.ApplicationMessage.Payload);
-        listBox1.BeginInvoke(
-                                _updateListBoxAction,
-                                $"{DateTime.Now} ClientID:{e.ClientId} | TOPIC:{topic} | Payload:{payload} | QoS:{e.ApplicationMessage.QualityOfServiceLevel} | Retain:{e.ApplicationMessage.Retain}"
-                                );
+        //listBox1.BeginInvoke(
+        //                        _updateListBoxAction,
+        //                        $"{DateTime.Now} ClientID:{e.ClientId} | TOPIC:{topic} | Payload:{payload} | QoS:{e.ApplicationMessage.QualityOfServiceLevel} | Retain:{e.ApplicationMessage.Retain}"
+        //                        );
         if (topic == "command/m16")
         {
             if (payload == "shutdown")

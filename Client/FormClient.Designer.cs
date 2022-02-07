@@ -28,33 +28,74 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.服务器 = new System.Windows.Forms.Label();
+            this.LblServerConnState = new System.Windows.Forms.Label();
+            this.LblNetworkConnState = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
-            // listBox1
+            // 服务器
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 17;
-            this.listBox1.Location = new System.Drawing.Point(29, 34);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(744, 293);
-            this.listBox1.TabIndex = 0;
+            this.服务器.AutoSize = true;
+            this.服务器.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.服务器.Location = new System.Drawing.Point(24, 58);
+            this.服务器.Name = "服务器";
+            this.服务器.Size = new System.Drawing.Size(58, 21);
+            this.服务器.TabIndex = 0;
+            this.服务器.Text = "服务器";
+            // 
+            // LblServerConnState
+            // 
+            this.LblServerConnState.AutoSize = true;
+            this.LblServerConnState.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LblServerConnState.Location = new System.Drawing.Point(151, 58);
+            this.LblServerConnState.Name = "LblServerConnState";
+            this.LblServerConnState.Size = new System.Drawing.Size(21, 21);
+            this.LblServerConnState.TabIndex = 1;
+            this.LblServerConnState.Text = "√";
+            // 
+            // LblNetworkConnState
+            // 
+            this.LblNetworkConnState.AutoSize = true;
+            this.LblNetworkConnState.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LblNetworkConnState.Location = new System.Drawing.Point(151, 112);
+            this.LblNetworkConnState.Name = "LblNetworkConnState";
+            this.LblNetworkConnState.Size = new System.Drawing.Size(21, 21);
+            this.LblNetworkConnState.TabIndex = 3;
+            this.LblNetworkConnState.Text = "√";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.label2.Location = new System.Drawing.Point(24, 112);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(42, 21);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "网络";
             // 
             // FormClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 396);
-            this.Controls.Add(this.listBox1);
+            this.ClientSize = new System.Drawing.Size(252, 292);
+            this.Controls.Add(this.LblNetworkConnState);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.LblServerConnState);
+            this.Controls.Add(this.服务器);
             this.Name = "FormClient";
             this.Text = "远程桌面管家客户端";
             this.Load += new System.EventHandler(this.FormClient_Load);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
         #endregion
 
-        private ListBox listBox1;
+        private Label 服务器;
+        private Label LblServerConnState;
+        private Label LblNetworkConnState;
+        private Label label2;
     }
 }
