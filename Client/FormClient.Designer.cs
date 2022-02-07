@@ -48,6 +48,7 @@
             // 
             this.LblServerConnState.AutoSize = true;
             this.LblServerConnState.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LblServerConnState.ForeColor = System.Drawing.Color.Green;
             this.LblServerConnState.Location = new System.Drawing.Point(151, 58);
             this.LblServerConnState.Name = "LblServerConnState";
             this.LblServerConnState.Size = new System.Drawing.Size(21, 21);
@@ -58,6 +59,7 @@
             // 
             this.LblNetworkConnState.AutoSize = true;
             this.LblNetworkConnState.Font = new System.Drawing.Font("Microsoft YaHei UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.LblNetworkConnState.ForeColor = System.Drawing.Color.Green;
             this.LblNetworkConnState.Location = new System.Drawing.Point(151, 112);
             this.LblNetworkConnState.Name = "LblNetworkConnState";
             this.LblNetworkConnState.Size = new System.Drawing.Size(21, 21);
