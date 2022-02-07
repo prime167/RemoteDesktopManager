@@ -89,7 +89,7 @@ public partial class FormClient : Form
             }
             else if (_failCount > 0)
             {
-                _logger.Info($"网络恢复, 网络时间:{nt}, 本机时间:{sysTime}");
+                _logger.Info($"网络失败 {_failCount} 次后恢复, 网络时间:{nt}, 本机时间:{sysTime}");
             }
 
             _failCount = 0;
