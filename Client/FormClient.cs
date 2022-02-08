@@ -301,6 +301,7 @@ public partial class FormClient : Form
         }
         else
         {
+            _logger.Info($"服务器，进入休眠");
             Cli.Wrap("cmd").WithArguments($@"/C shutdown /h ").ExecuteAsync();
         }
     }
