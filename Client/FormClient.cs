@@ -61,7 +61,7 @@ public partial class FormClient : Form
                 LblNetworkConnState.ForeColor = Color.Red;
             });
 
-            if (_lastState == 11 || _lastState == 12)
+            if (_lastState == 11 || _lastState == 12 || _lastState == 13)
             {
                 _lastState = 0;
                 _timer.Change(Interval, Interval);
@@ -274,9 +274,9 @@ public partial class FormClient : Form
             }
             else if (payload == "sleep")
             {
-                _lastState = 13;
                 _okCount = 0;
-                Sleep(true);
+                _logger.Info($"收到服务器休眠领命，进入休眠");
+                Sleep(13);
             }
         }
     }
@@ -301,7 +301,6 @@ public partial class FormClient : Form
         }
         else
         {
-            _logger.Info($"服务器，进入休眠");
             Cli.Wrap("cmd").WithArguments($@"/C shutdown /h ").ExecuteAsync();
         }
     }

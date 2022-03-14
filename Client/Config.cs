@@ -14,5 +14,6 @@ internal class Config
 public class SleepTime
 {
     public int Hour { get; set; }
+
     public int Minute { get; set; }
 }
