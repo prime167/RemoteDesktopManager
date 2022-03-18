@@ -41,12 +41,11 @@ public class NetworkTime
             var r = response.Headers.TryGetValues("Date", out var dateTime);
             var dd = dateTime.ToArray()[0];
             var dt = DateTime.Parse(dd);
-            _logger.Trace($"{url,-30} {dt}");
             return dt;
         }
         catch (Exception ex)
         {
-            _logger.Trace(url+" "+ex.Message);
+            _logger.Debug(url+" "+ex.Message);
             return DateTime.MinValue;
         }
         finally

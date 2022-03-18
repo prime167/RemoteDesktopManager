@@ -38,6 +38,7 @@ public partial class FormManager : Form
             {
                 listBox1.Items.RemoveAt(0);
             }
+
             listBox1.TopIndex = listBox1.Items.Count - 1;
             listBox1.EndUpdate();
         };
@@ -76,11 +77,19 @@ public partial class FormManager : Form
         _mqttServer.ClientConnectedHandler = new MqttServerClientConnectedHandlerDelegate(e =>
         {
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} connected");
+            label1.BeginInvoke(() =>
+            {
+                label1.BackColor = Color.Green;
+            });
         });
 
         _mqttServer.ClientDisconnectedHandler = new MqttServerClientDisconnectedHandlerDelegate(e =>
         {
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} disconnected");
+            label1.BeginInvoke(() =>
+            {
+                label1.BackColor = Color.Gray;
+            });
         });
 
         _mqttServer.StartAsync(optionBuilder.Build()).Wait();

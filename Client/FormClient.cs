@@ -34,13 +34,13 @@ public partial class FormClient : Form
         InitializeComponent();
     }
 
-    private void FormClient_Load(object sender, EventArgs e)
+    private async void FormClient_Load(object sender, EventArgs e)
     {
         _logger.Debug("Init...");
         var str = File.ReadAllText("config.toml");
         _config = TomletMain.To<Config>(str);
         _timer = new Timer(CallBack, null, Interval, Interval);
-        MqttClient();
+        await MqttClient();
         if (_config.SleepTime.Hour >= 0)
         {
             LblHibernateTime.Text = $"{_config.SleepTime.Hour}:{_config.SleepTime.Minute}";
@@ -147,7 +147,7 @@ public partial class FormClient : Form
         Sleep(true);
     }
 
-    private void MqttClient()
+    private async Task MqttClient()
     {
         try
         {
@@ -175,7 +175,7 @@ public partial class FormClient : Form
 
             if (null != _mqttClient)
             {
-                _mqttClient.DisconnectAsync();
+                await _mqttClient.DisconnectAsync();
                 _mqttClient = null;
             }
 
@@ -195,7 +195,7 @@ public partial class FormClient : Form
                 });
             });
 
-            _mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(e =>
+            _mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(async e =>
             {
                 this.BeginInvoke(() =>
                 {
@@ -203,41 +203,51 @@ public partial class FormClient : Form
                     LblServerConnState.ForeColor = Color.Red;
                 });
 
-                Thread.Sleep(1000);
-                _mqttClient.ConnectAsync(options).Wait();
-                _mqttClient.SubscribeAsync(
+                await Task.Delay(1000);
+                try
+                {
+                    await _mqttClient.ConnectAsync(options).WaitAsync(TimeSpan.FromMilliseconds(300));
+                }
+                catch (Exception ex)
+                {
+                    //_logger.Error("无法连接到服务器:" + ex.Message);
+                }
+
+                await _mqttClient.SubscribeAsync(
                    new MqttTopicFilter
                    {
                        Topic = "command/m16",
                        QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce
-                   }).Wait();
+                   });
 
-                for (int i = 0; i < 10; i++)
+                var msg = new MqttApplicationMessage
                 {
-                    var msg = new MqttApplicationMessage
-                    {
-                        Topic = "status/m16",
-                        Payload = Encoding.UTF8.GetBytes("connected"),
-                        QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
-                        Retain = false
-                    };
+                    Topic = "status/m16",
+                    Payload = Encoding.UTF8.GetBytes("connected"),
+                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
+                    Retain = false
+                };
 
-                    if (_mqttClient is not null)
-                    {
-                        _mqttClient.PublishAsync(msg).Wait();
-                    }
-
-                    Thread.Sleep(100);
+                if (_mqttClient is not null)
+                {
+                    await _mqttClient.PublishAsync(msg);
                 }
             });
 
-            _mqttClient.ConnectAsync(options).Wait();
-            _mqttClient.SubscribeAsync(
+            try
+            {
+                await _mqttClient.ConnectAsync(options).WaitAsync(TimeSpan.FromMilliseconds(300));
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("无法连接到服务器:"+ex.Message);
+            }
+            await _mqttClient.SubscribeAsync(
                new MqttTopicFilter
                {
                    Topic = "command/m16",
                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce
-               }).Wait();
+               });
 
             var msg = new MqttApplicationMessage
             {
@@ -249,7 +259,7 @@ public partial class FormClient : Form
 
             if (_mqttClient is not null)
             {
-                _mqttClient.PublishAsync(msg);
+                await _mqttClient.PublishAsync(msg);
             }
         }
         catch (Exception ex)
