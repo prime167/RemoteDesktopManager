@@ -39,12 +39,13 @@ public partial class FormClient : Form
         _logger.Debug("Init...");
         var str = File.ReadAllText("config.toml");
         _config = TomletMain.To<Config>(str);
-        _timer = new Timer(CallBack, null, Interval, Interval);
-        await MqttClient();
         if (_config.SleepTime.Hour >= 0)
         {
             LblHibernateTime.Text = $"{_config.SleepTime.Hour}:{_config.SleepTime.Minute}";
         }
+
+        _timer = new Timer(CallBack, null, Interval, Interval);
+        await MqttClient();
     }
 
     private void CallBack(object? state)
@@ -210,7 +211,7 @@ public partial class FormClient : Form
                 }
                 catch (Exception ex)
                 {
-                    //_logger.Error("无法连接到服务器:" + ex.Message);
+                    //_logger.Error("无法重新连接到服务器:" + ex.Message);
                 }
 
                 await _mqttClient.SubscribeAsync(
