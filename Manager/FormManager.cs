@@ -1,18 +1,17 @@
-using MQTTnet.Client.Receiving;
-using MQTTnet.Server;
+using System.Text;
+using CliWrap;
 using MQTTnet;
-using MQTTnet.Protocol;
+using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
+using MQTTnet.Client.Receiving;
 using MQTTnet.Formatter;
-using System.Text;
-using MQTTnet.Client;
-using Manager;
+using MQTTnet.Protocol;
+using MQTTnet.Server;
 using Tomlet;
-using CliWrap;
 
-namespace RemoteDesktopManager;
+namespace Manager;
 
 public partial class FormManager : Form
 {

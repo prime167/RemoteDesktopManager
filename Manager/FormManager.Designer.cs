@@ -1,4 +1,4 @@
-﻿namespace RemoteDesktopManager
+﻿namespace Manager
 {
     partial class FormManager
     {

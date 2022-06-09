@@ -1,4 +1,4 @@
-﻿namespace RemoteDesktopClient
+﻿namespace Client
 {
     partial class FormClient
     {

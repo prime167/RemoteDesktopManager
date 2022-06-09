@@ -1,3 +1,5 @@
+using System.Text;
+using CliWrap;
 using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Connecting;
@@ -5,15 +7,12 @@ using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 using MQTTnet.Client.Receiving;
 using MQTTnet.Formatter;
-using System.Text;
 using MQTTnet.Protocol;
-using CliWrap;
-using Client;
+using NLog;
 using Tomlet;
 using Timer = System.Threading.Timer;
-using NLog;
 
-namespace RemoteDesktopClient;
+namespace Client;
 
 public partial class FormClient : Form
 {
@@ -21,10 +20,10 @@ public partial class FormClient : Form
     private Config _config;
     private Timer _timer;
     private int _failCount;
-    private Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly Logger _logger = LogManager.GetCurrentClassLogger();
     private int _totalOkCount = 0;
     private int _okCount = 0;
-    private NetworkTime NetworkTime = new NetworkTime();
+    private readonly NetworkTime _networkTime = new NetworkTime();
     private int _lastState;
     private int _networkFailCausedSleepCount;
     private const int Interval = 3000;
@@ -51,7 +50,7 @@ public partial class FormClient : Form
     private void CallBack(object? state)
     {
         var sysTime = DateTime.Now;
-        var nt = NetworkTime.GetNetworkTime();
+        var nt = _networkTime.GetNetworkTime();
         if (nt.Year < 1970)
         {
             _failCount++;
