@@ -11,7 +11,7 @@
         <PackageReference Include="CliWrap" Version="3.4.*" />
         <PackageReference Include="MQTTnet" Version="3.1.*" />
         <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.1.*" />
-        <PackageReference Include="NLog" Version="4.7.*" />
+        <PackageReference Include="NLog" Version="5.0.0" />
         <PackageReference Include="Samboy063.Tomlet" Version="3.1.*" />
     </ItemGroup>
     <ItemGroup>
