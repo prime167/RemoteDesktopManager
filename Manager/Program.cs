@@ -1,4 +1,4 @@
-namespace RemoteDesktopManager;
+namespace Manager;
 
 internal static class Program
 {
