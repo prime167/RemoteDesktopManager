@@ -33,6 +33,7 @@
             this.BtnShutDown = new System.Windows.Forms.Button();
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.BtnShutDownSelf = new System.Windows.Forms.Button();
+            this.BtnSleepSelf = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -84,11 +85,22 @@
             this.BtnShutDownSelf.UseVisualStyleBackColor = true;
             this.BtnShutDownSelf.Click += new System.EventHandler(this.BtnShutDownSelf_Click);
             // 
+            // BtnSleepSelf
+            // 
+            this.BtnSleepSelf.Location = new System.Drawing.Point(221, 560);
+            this.BtnSleepSelf.Name = "BtnSleepSelf";
+            this.BtnSleepSelf.Size = new System.Drawing.Size(84, 30);
+            this.BtnSleepSelf.TabIndex = 5;
+            this.BtnSleepSelf.Text = "本机休眠";
+            this.BtnSleepSelf.UseVisualStyleBackColor = true;
+            this.BtnSleepSelf.Click += new System.EventHandler(this.BtnSleepSelf_Click);
+            // 
             // FormManager
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 614);
+            this.Controls.Add(this.BtnSleepSelf);
             this.Controls.Add(this.BtnShutDownSelf);
             this.Controls.Add(this.listBox1);
             this.Controls.Add(this.BtnShutDown);
@@ -108,5 +120,6 @@
         private Button BtnShutDown;
         private ListBox listBox1;
         private Button BtnShutDownSelf;
+        private Button BtnSleepSelf;
     }
 }

@@ -54,8 +54,8 @@ public partial class FormManager : Form
             var arg = Args[0];
             if (arg == "both")
             {
-                BtnSleep_Click(null, null);
-                BtnShutDownSelf_Click(null, null);
+                BtnSleep_Click(this, EventArgs.Empty);
+                BtnSleepSelf_Click(this, EventArgs.Empty);
             }
         }
     }
@@ -212,5 +212,11 @@ public partial class FormManager : Form
     {
         Cli.Wrap("cmd").WithArguments($@"/C shutdown -s -t 0 ").ExecuteAsync();
         //Cli.Wrap("cmd").WithArguments($@"/C code ").ExecuteAsync();
+    }
+
+    private void BtnSleepSelf_Click(object sender, EventArgs e)
+    {
+        Cli.Wrap("cmd").WithArguments($@"/C shutdown /h ").ExecuteAsync();
+
     }
 }
