@@ -36,7 +36,7 @@ public partial class FormClient : Form
     private async void FormClient_Load(object sender, EventArgs e)
     {
         _logger.Debug("Init...");
-        var str = File.ReadAllText("config.toml");
+        var str = await File.ReadAllTextAsync("config.toml");
         _config = TomletMain.To<Config>(str);
         if (_config.SleepTime.Hour >= 0)
         {
@@ -81,7 +81,7 @@ public partial class FormClient : Form
                 {
                     _logger.Info($"软件启动, 网络时间:{nt}, 本机时间:{sysTime}");
                 }
-                else if (_lastState > 10 && _lastState < 20)
+                else if (_lastState is > 10 and < 20)
                 {
                     _timer.Change(Interval, Interval);
                     _lastState = 0;
@@ -153,7 +153,7 @@ public partial class FormClient : Form
         {
             var options = new MqttClientOptions
             {
-                ClientId = _config.Server.Name,
+                ClientId = _config.Client.Name,
                 ProtocolVersion = MqttProtocolVersion.V500
             };
 
@@ -286,7 +286,7 @@ public partial class FormClient : Form
             {
                 _okCount = 0;
                 _logger.Info($"收到服务器休眠领命，进入休眠");
-                Sleep(13);
+                //Sleep(13);
             }
         }
     }

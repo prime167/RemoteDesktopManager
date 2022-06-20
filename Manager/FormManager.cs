@@ -55,7 +55,7 @@ public partial class FormManager : Form
             if (arg == "both")
             {
                 BtnSleep_Click(this, EventArgs.Empty);
-                BtnSleepSelf_Click(this, EventArgs.Empty);
+                //BtnSleepSelf_Click(this, EventArgs.Empty);
             }
         }
     }
@@ -78,7 +78,10 @@ public partial class FormManager : Form
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} connected");
             label1.BeginInvoke(() =>
             {
-                label1.BackColor = Color.Green;
+                if (e.ClientId == "16")
+                {
+                    label1.BackColor = Color.Green;
+                }
             });
         });
 
@@ -87,7 +90,10 @@ public partial class FormManager : Form
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} disconnected");
             label1.BeginInvoke(() =>
             {
-                label1.BackColor = Color.Gray;
+                if (e.ClientId == "16")
+                {
+                    label1.BackColor = Color.Gray;
+                }
             });
         });
 
@@ -96,7 +102,7 @@ public partial class FormManager : Form
 
     private void MqttClient()
     {
-        try
+        //try
         {
             var options = new MqttClientOptions
             {
@@ -146,9 +152,9 @@ public partial class FormManager : Form
                    QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce
                }).Wait();
         }
-        catch (Exception ex)
+        //catch (Exception ex)
         {
-            throw;
+        //    throw;
         }
 
         void DeakMessage(MqttApplicationMessageReceivedEventArgs e)
@@ -186,10 +192,7 @@ public partial class FormManager : Form
             Retain = false
         };
 
-        if (_mqttClient is not null)
-        {
-            _mqttClient.PublishAsync(msg);
-        }
+        _mqttClient.PublishAsync(msg);
     }
 
     private void BtnShutDown_Click(object sender, EventArgs e)

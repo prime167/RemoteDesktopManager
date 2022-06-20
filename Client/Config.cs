@@ -7,6 +7,8 @@ internal class Config
 {
     public Server Server { get; set; }
 
+    public Common.Client Client { get; set; }
+
     public SleepTime SleepTime { get; set; }
 }
 

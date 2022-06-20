@@ -7,19 +7,19 @@ namespace Client;
 
 public class NetworkTime
 {
-    private HttpClient httpClient;
+    private readonly HttpClient _httpClient;
     private string[] _urls;
 
     private int _urlIndex;
 
-    private Logger _logger = LogManager.GetCurrentClassLogger();
+    private readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
     public NetworkTime()
     {
-        httpClient = new HttpClient(new HttpClientHandler { UseProxy = false });
-        httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
-        httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
-        httpClient.Timeout = TimeSpan.FromSeconds(2);
+        _httpClient = new HttpClient(new HttpClientHandler { UseProxy = false });
+        _httpClient.DefaultRequestHeaders.CacheControl = new CacheControlHeaderValue { NoCache = true };
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (compatible, MSIE 11, Windows NT 6.3; Trident/7.0; rv:11.0) like Gecko");
+        _httpClient.Timeout = TimeSpan.FromSeconds(2);
         var str = File.ReadAllText("urls.toml");
         _urls = TomletMain.To<UrlConfig>(str).Urls;
     }
@@ -35,7 +35,7 @@ public class NetworkTime
         {
             url = GetNextUrl();
             var sw = Stopwatch.StartNew();
-            var response = httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
+            var response = _httpClient.SendAsync(new HttpRequestMessage(HttpMethod.Head, url)).Result;
             response.EnsureSuccessStatusCode();
             sw.Stop();
             var r = response.Headers.TryGetValues("Date", out var dateTime);
