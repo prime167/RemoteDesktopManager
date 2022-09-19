@@ -44,7 +44,7 @@ public partial class FormClient : Form
         await MqttClient();
     }
 
-    private void CallBack(object? state)
+    private void CallBack(object state)
     {
         var sysTime = DateTime.Now;
         var nt = _networkTime.GetNetworkTime();
