@@ -2,11 +2,8 @@ using System.Text;
 using CliWrap;
 using MQTTnet;
 using MQTTnet.Client;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
-using MQTTnet.Client.Options;
-using MQTTnet.Client.Receiving;
 using MQTTnet.Formatter;
+using MQTTnet.Packets;
 using MQTTnet.Protocol;
 using NLog;
 using Tomlet;
@@ -165,13 +162,10 @@ public partial class FormClient : Form
 
             options.CleanSession = true;
             options.KeepAlivePeriod = TimeSpan.FromSeconds(100.5);
-            options.WillMessage = new MqttApplicationMessage
-            {
-                Topic = "status/m16",
-                Payload = Encoding.UTF8.GetBytes("disconnected"),
-                QualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce,
-                Retain = false
-            };
+            options.WillTopic = "status/m16";
+            options.WillRetain = false;
+            options.WillQualityOfServiceLevel = MqttQualityOfServiceLevel.AtLeastOnce;
+            options.WillPayload = Encoding.UTF8.GetBytes("disconnected");
 
             if (null != _mqttClient)
             {
@@ -181,21 +175,21 @@ public partial class FormClient : Form
 
             _mqttClient = new MqttFactory().CreateMqttClient();
 
-            _mqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(e =>
+            _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 DealMessage(e);
-            });
+            };
 
-            _mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(e =>
+            _mqttClient.ConnectedAsync += async e =>
             {
                 this.BeginInvoke(() =>
                 {
                     LblServerConnState.Text = "¡Ì";
                     LblServerConnState.ForeColor = Color.Green;
                 });
-            });
+            };
 
-            _mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(async e =>
+            _mqttClient.DisconnectedAsync += async e =>
             {
                 this.BeginInvoke(() =>
                 {
@@ -232,7 +226,7 @@ public partial class FormClient : Form
                 {
                     await _mqttClient.PublishAsync(msg);
                 }
-            });
+            };
 
             try
             {

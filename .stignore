@@ -1,5 +1,7 @@
 obj
 logs
+.vs
+.git
 *.suo
 *.pdb
 *.log

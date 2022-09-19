@@ -8,11 +8,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="CliWrap" Version="3.4.*" />
-        <PackageReference Include="MQTTnet" Version="3.1.*" />
-        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.1.*" />
-        <PackageReference Include="NLog" Version="5.0.0" />
-        <PackageReference Include="Samboy063.Tomlet" Version="3.1.*" />
+        <PackageReference Include="CliWrap" Version="3.5.0" />
+        <PackageReference Include="MQTTnet" Version="4.1.0.*" />
+        <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.1.0.247" />
+        <PackageReference Include="NLog" Version="5.0.*" />
+        <PackageReference Include="Samboy063.Tomlet" Version="4.0.*" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\Common\Common.csproj" />

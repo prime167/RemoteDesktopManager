@@ -2,11 +2,9 @@ using System.Text;
 using CliWrap;
 using MQTTnet;
 using MQTTnet.Client;
-using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
-using MQTTnet.Client.Options;
-using MQTTnet.Client.Receiving;
+
 using MQTTnet.Formatter;
+using MQTTnet.Packets;
 using MQTTnet.Protocol;
 using MQTTnet.Server;
 using Tomlet;
@@ -15,7 +13,7 @@ namespace Manager;
 
 public partial class FormManager : Form
 {
-    private IMqttServer _mqttServer;
+    private MqttServer _mqttServer;
     private IMqttClient _mqttClient;
     private Action<string> _updateListBoxAction;
     private Config _config;
@@ -67,13 +65,15 @@ public partial class FormManager : Form
             return;
         }
 
-        var optionBuilder =
-            new MqttServerOptionsBuilder()
+        MqttServerOptionsBuilder builder = new MqttServerOptionsBuilder();
+        var options =
+            builder
+                .WithDefaultEndpoint()
                 .WithConnectionBacklog(1000)
-                .WithDefaultEndpointPort(_config.Server.Port);
+                .WithDefaultEndpointPort(_config.Server.Port).Build();
 
-        _mqttServer = new MqttFactory().CreateMqttServer();
-        _mqttServer.ClientConnectedHandler = new MqttServerClientConnectedHandlerDelegate(e =>
+        _mqttServer = new MqttFactory().CreateMqttServer(options);
+        _mqttServer.ClientConnectedAsync += async e =>
         {
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} connected");
             label1.BeginInvoke(() =>
@@ -83,9 +83,9 @@ public partial class FormManager : Form
                     label1.BackColor = Color.Green;
                 }
             });
-        });
+        };
 
-        _mqttServer.ClientDisconnectedHandler = new MqttServerClientDisconnectedHandlerDelegate(e =>
+        _mqttServer.ClientDisconnectedAsync += async e =>
         {
             listBox1.BeginInvoke(_updateListBoxAction, $"{DateTime.Now} Client {e.ClientId} disconnected");
             label1.BeginInvoke(() =>
@@ -95,9 +95,10 @@ public partial class FormManager : Form
                     label1.BackColor = Color.Gray;
                 }
             });
-        });
 
-        _mqttServer.StartAsync(optionBuilder.Build()).Wait();
+        };
+
+        _mqttServer.StartAsync().Wait();
     }
 
     private void MqttClient()
@@ -127,22 +128,22 @@ public partial class FormManager : Form
 
             _mqttClient = new MqttFactory().CreateMqttClient();
 
-            _mqttClient.ApplicationMessageReceivedHandler = new MqttApplicationMessageReceivedHandlerDelegate(e =>
+            _mqttClient.ApplicationMessageReceivedAsync += async e =>
             {
                 DeakMessage(e);
-            });
+            };
 
-            _mqttClient.ConnectedHandler = new MqttClientConnectedHandlerDelegate(e =>
+            _mqttClient.ConnectedAsync += async e =>
             {
                 //listBox1.BeginInvoke(_updateListBoxAction,
                 //    $"{DateTime.Now} Client is Connected:  IsSessionPresent:{e.ConnectResult}");
-            });
+            };
 
-            _mqttClient.DisconnectedHandler = new MqttClientDisconnectedHandlerDelegate(e =>
+            _mqttClient.DisconnectedAsync += async e =>
             {
                 //listBox1.BeginInvoke(_updateListBoxAction,
                 //    $"{DateTime.Now} Client is DisConnected ClientWasConnected:{e.ClientWasConnected}");
-            });
+            };
 
             _mqttClient.ConnectAsync(options).Wait();
             _mqttClient.SubscribeAsync(
